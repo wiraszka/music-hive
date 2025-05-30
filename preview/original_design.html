@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adam's Bomb Ass Music Downloader</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+    
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('https://i.ibb.co/hYvfSV3/bg-main.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+    
+    .content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: white;
+    }
+    
+    .music-is-life {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .music-text {
+      font-size: 80px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 5px;
+      line-height: 1;
+      font-family: 'Helvetica', Arial, sans-serif;
+    }
+    
+    .is-text {
+      font-size: 30px;
+      font-style: italic;
+      position: relative;
+      display: inline-block;
+      margin: 5px 0;
+    }
+    
+    .is-badge {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .is-badge:before {
+      content: '';
+      position: absolute;
+      left: -20px;
+      right: -20px;
+      top: 50%;
+      height: 30px;
+      background-color: #e9c46a;
+      transform: translateY(-50%);
+      z-index: -1;
+    }
+    
+    .life-text {
+      font-size: 100px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 5px;
+      line-height: 1;
+      font-family: 'Helvetica', Arial, sans-serif;
+    }
+    
+    .search-bar {
+      display: flex;
+      width: 600px;
+      margin-top: 20px;
+    }
+    
+    .search-input {
+      flex: 1;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      outline: none;
+    }
+    
+    .search-button {
+      padding: 12px 25px;
+      font-size: 16px;
+      background-color: #f0f0f0;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .search-button:hover {
+      background-color: #e0e0e0;
+    }
+    
+    .top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .app-title {
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+    }
+    
+    .app-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 10px;
+    }
+    
+    .menu {
+      display: flex;
+    }
+    
+    .menu-item {
+      color: white;
+      margin-left: 20px;
+      cursor: pointer;
+    }
+    
+    /* Results view styling */
+    .results-container {
+      width: 600px;
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+      display: none;
+    }
+    
+    .result-item {
+      display: flex;
+      padding: 15px;
+      border-bottom: 1px solid #e0e0e0;
+      cursor: pointer;
+    }
+    
+    .result-item:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .result-album-art {
+      width: 60px;
+      height: 60px;
+      margin-right: 15px;
+      object-fit: cover;
+    }
+    
+    .result-details {
+      flex: 1;
+    }
+    
+    .result-title {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    
+    .result-album {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .result-duration {
+      color: #999;
+      font-size: 14px;
+    }
+    
+    /* Toggle for search/results view */
+    .show-results .music-is-life {
+      transform: translateY(-150px);
+      transition: transform 0.5s ease;
+    }
+    
+    .show-results .results-container {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="appContainer">
+    <div class="background"></div>
+    
+    <div class="top-bar">
+      <div class="app-title">
+        <img src="https://i.ibb.co/XxH2G2c/my-icon.png" alt="App Icon" class="app-icon">
+        Adam's Bomb Ass Music Downloader
+      </div>
+      <div class="menu">
+        <div class="menu-item">File</div>
+        <div class="menu-item">Help</div>
+      </div>
+    </div>
+    
+    <div class="content">
+      <div class="music-is-life">
+        <div class="music-text">MUSIC</div>
+        <div class="is-text">
+          <span class="is-badge">is</span>
+        </div>
+        <div class="life-text">LIFE</div>
+      </div>
+      
+      <div class="search-bar">
+        <input type="text" class="search-input" placeholder="Enter song name or artist...">
+        <button class="search-button" onclick="toggleResults()">Search</button>
+      </div>
+      
+      <div class="results-container">
+        <div class="result-item">
+          <img src="https://i.ibb.co/xfbPPPy/flume-skin.jpg" class="result-album-art" alt="Album Art">
+          <div class="result-details">
+            <div class="result-title">1: Flume - Never Be Like You (feat. Kai)</div>
+            <div class="result-album">Album: Skin - 0:03:54</div>
+          </div>
+        </div>
+        <div class="result-item">
+          <img src="https://i.ibb.co/JcGv4rN/bon-iver.jpg" class="result-album-art" alt="Album Art">
+          <div class="result-details">
+            <div class="result-title">2: Bon Iver - Flume</div>
+            <div class="result-album">Album: For Emma, Forever Ago - 0:03:39</div>
+          </div>
+        </div>
+        <div class="result-item">
+          <img src="https://i.ibb.co/xfbPPPy/flume-skin.jpg" class="result-album-art" alt="Album Art">
+          <div class="result-details">
+            <div class="result-title">3: Flume - Say It (feat. Tove Lo)</div>
+            <div class="result-album">Album: Skin - 0:04:22</div>
+          </div>
+        </div>
+        <div class="result-item">
+          <img src="https://i.ibb.co/w0qg9JF/disclosure.jpg" class="result-album-art" alt="Album Art">
+          <div class="result-details">
+            <div class="result-title">4: Disclosure - You & Me - Flume Remix</div>
+            <div class="result-album">Album: Settle (Special Edition) - 0:04:42</div>
+          </div>
+        </div>
+        <div class="result-item">
+          <img src="https://i.ibb.co/w0qg9JF/disclosure.jpg" class="result-album-art" alt="Album Art">
+          <div class="result-details">
+            <div class="result-title">5: Disclosure - You & Me - Flume Remix</div>
+            <div class="result-album">Album: Settle (The Remixes) - 0:04:42</div>
+          </div>
+        </div>
+        <div class="result-item">
+          <img src="https://i.ibb.co/5T8Gmhx/lorde.jpg" class="result-album-art" alt="Album Art">
+          <div class="result-details">
+            <div class="result-title">6: Lorde - Tennis Court - Flume Remix</div>
+            <div class="result-album">Album: Tennis Court (Flume Remix) - 0:06:03</div>
+          </div>
+        </div>
+        <div class="result-item">
+          <img src="https://i.ibb.co/S7Jnfhw/flume-difference.jpg" class="result-album-art" alt="Album Art">
+          <div class="result-details">
+            <div class="result-title">7: Flume - The Difference</div>
+            <div class="result-album">Album: The Difference - 0:02:19</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function toggleResults() {
+      const container = document.getElementById('appContainer');
+      container.classList.toggle('show-results');
+      
+      // Get the search input value
+      const searchInput = document.querySelector('.search-input');
+      console.log('Search query:', searchInput.value);
+      
+      // In a real implementation, this would trigger the YouTube search
+    }
+    
+    // For demo - allow pressing Enter in search input
+    document.querySelector('.search-input').addEventListener('keyup', function(event) {
+      if (event.key === 'Enter') {
+        toggleResults();
+      }
+    });
+  </script>
+</body>
+</html>

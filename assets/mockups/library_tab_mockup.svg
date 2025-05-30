@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1100" height="700" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="1100" height="700" fill="#F5F6FA"/>
+  
+  <!-- Header/Title bar -->
+  <rect x="0" y="0" width="1100" height="30" fill="#2D3436"/>
+  <text x="20" y="20" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="white">Music Downloader &amp; Library Manager</text>
+  
+  <!-- Sidebar -->
+  <rect x="0" y="30" width="220" height="670" fill="#2D3436"/>
+  
+  <!-- Sidebar Header -->
+  <rect x="0" y="30" width="220" height="60" fill="#1e2527"/>
+  <text x="20" y="65" font-family="Segoe UI, SF Pro, Arial" font-size="18" font-weight="bold" fill="white">Music Downloader</text>
+  
+  <!-- Sidebar Navigation Buttons -->
+  <rect x="10" y="110" width="200" height="40" rx="4" ry="4" fill="transparent"/>
+  <text x="25" y="135" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="white">Download</text>
+  
+  <rect x="10" y="160" width="200" height="40" rx="4" ry="4" fill="#0984E3"/>
+  <text x="25" y="185" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="white">Library</text>
+  
+  <!-- Settings Button at Bottom -->
+  <rect x="10" y="640" width="200" height="40" rx="4" ry="4" fill="transparent"/>
+  <text x="25" y="665" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="white">Settings</text>
+  
+  <!-- Main Content Area - Library Tab -->
+  <rect x="220" y="30" width="880" height="670" fill="#F5F6FA"/>
+  
+  <!-- Library Header -->
+  <text x="240" y="65" font-family="Segoe UI, SF Pro, Arial" font-size="18" font-weight="bold" fill="#2D3436">Music Library</text>
+  
+  <text x="620" y="65" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Library path: /Users/adamwiraszka/Desktop/ADAM/Adam's Music</text>
+  
+  <rect x="925" y="45" width="80" height="35" rx="4" ry="4" fill="#0984E3"/>
+  <text x="933" y="67" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="white">Set Path</text>
+  
+  <rect x="1015" y="45" width="85" height="35" rx="4" ry="4" fill="#0984E3"/>
+  <text x="1025" y="67" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="white">Scan</text>
+  
+  <!-- Filter Options -->
+  <rect x="240" y="85" width="300" height="30" rx="4" ry="4" fill="white" stroke="#dfe6e9"/>
+  <rect x="245" y="90" width="20" height="20" rx="4" ry="4" fill="#0984E3"/>
+  <text x="275" y="105" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Show tracks with missing metadata only</text>
+  
+  <!-- Progress Bar (for scanning) -->
+  <rect x="240" y="125" width="840" height="20" rx="4" ry="4" fill="white" stroke="#dfe6e9"/>
+  <rect x="240" y="125" width="336" height="20" rx="4" ry="4" fill="#0984E3"/>
+  <text x="650" y="140" font-family="Segoe UI, SF Pro, Arial" font-size="12" fill="#2D3436">Scanning... 40%</text>
+  
+  <!-- Library Table -->
+  <rect x="240" y="155" width="840" height="500" rx="4" ry="4" fill="white" stroke="#dfe6e9"/>
+  
+  <!-- Table Headers -->
+  <rect x="240" y="155" width="840" height="35" rx="4" ry="4" fill="#dfe6e9"/>
+  <text x="255" y="177" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Title</text>
+  <text x="400" y="177" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Artist</text>
+  <text x="550" y="177" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Album</text>
+  <text x="700" y="177" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Year</text>
+  <text x="795" y="177" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Status</text>
+  <text x="920" y="177" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Actions</text>
+  
+  <!-- Table Rows (Example Data) -->
+  <!-- Row 1 - Complete metadata -->
+  <rect x="240" y="190" width="840" height="40" fill="#F5F6FA"/>
+  <text x="255" y="215" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436">Bohemian Rhapsody</text>
+  <text x="400" y="215" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436">Queen</text>
+  <text x="550" y="215" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436">A Night at the Opera</text>
+  <text x="700" y="215" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436">1975</text>
+  <text x="795" y="215" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#00b894">Complete</text>
+
+  <!-- Row 2 - Incomplete metadata -->
+  <rect x="240" y="230" width="840" height="40" fill="white"/>
+  <text x="255" y="255" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436">Hotel California</text>
+  <text x="400" y="255" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436">Eagles</text>
+  <text x="550" y="255" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436"></text>
+  <text x="700" y="255" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436"></text>
+  <text x="795" y="255" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#d63031">Incomplete</text>
+  <rect x="890" y="235" width="100" height="30" rx="4" ry="4" fill="#0984E3"/>
+  <text x="913" y="254" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="white">Get Info</text>
+
+  <!-- Row 3 - Incomplete metadata -->
+  <rect x="240" y="270" width="840" height="40" fill="#F5F6FA"/>
+  <text x="255" y="295" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436">Billie Jean</text>
+  <text x="400" y="295" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436">Michael Jackson</text>
+  <text x="550" y="295" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436"></text>
+  <text x="700" y="295" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436"></text>
+  <text x="795" y="295" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#d63031">Incomplete</text>
+  <rect x="890" y="275" width="100" height="30" rx="4" ry="4" fill="#0984E3"/>
+  <text x="913" y="294" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="white">Get Info</text>
+  
+  <!-- Example of metadata update dialog -->
+  <rect x="350" y="200" width="400" height="300" rx="8" ry="8" fill="white" stroke="#2D3436" stroke-width="2"/>
+  <rect x="350" y="200" width="400" height="40" rx="8" ry="8" fill="#2D3436"/>
+  <text x="520" y="225" font-family="Segoe UI, SF Pro, Arial" font-size="16" font-weight="bold" fill="white" text-anchor="middle">Update Metadata</text>
+  
+  <text x="370" y="265" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Title: Billie Jean</text>
+  <text x="370" y="295" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Artist: Michael Jackson</text>
+  <text x="370" y="325" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Album: Thriller</text>
+  <text x="370" y="355" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Year: 1982</text>
+  <text x="370" y="385" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Album Art: Available</text>
+  
+  <rect x="390" y="435" width="120" height="40" rx="4" ry="4" fill="#d63031"/>
+  <text x="425" y="460" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="white" text-anchor="middle">Cancel</text>
+  
+  <rect x="590" y="435" width="120" height="40" rx="4" ry="4" fill="#0984E3"/>
+  <text x="625" y="460" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="white" text-anchor="middle">Apply</text>
+</svg>

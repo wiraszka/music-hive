@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Downloader - Download Tab</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #F5F6FA;
+      color: #2D3436;
+    }
+    .app-container {
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 220px;
+      background-color: #2D3436;
+      color: white;
+    }
+    .sidebar-header {
+      background-color: #1e2527;
+      padding: 20px;
+    }
+    .sidebar-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
+    }
+    .sidebar-nav {
+      padding: 10px;
+    }
+    .nav-button {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 4px;
+      text-align: left;
+      font-size: 14px;
+      background-color: transparent;
+      color: white;
+      cursor: pointer;
+    }
+    .nav-button.active {
+      background-color: #0984E3;
+    }
+    .sidebar-footer {
+      position: absolute;
+      bottom: 20px;
+      width: 200px;
+      padding: 0 10px;
+    }
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .search-section {
+      display: flex;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .search-label {
+      font-size: 16px;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .search-input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #dfe6e9;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+    .search-button {
+      padding: 10px 20px;
+      background-color: #0984E3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .results-container {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    .results-column {
+      flex: 1;
+      margin-right: 20px;
+    }
+    .results-column:last-child {
+      margin-right: 0;
+    }
+    .column-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .results-table th {
+      background-color: #dfe6e9;
+      padding: 10px;
+      text-align: left;
+    }
+    .results-table td {
+      padding: 10px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .results-table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .options-section {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .quality-label {
+      margin-right: 10px;
+    }
+    .quality-select {
+      padding: 8px;
+      border: 1px solid #dfe6e9;
+      border-radius: 4px;
+      margin-right: 30px;
+    }
+    .location-label {
+      margin-right: 10px;
+      flex: 1;
+      text-align: right;
+    }
+    .change-button {
+      padding: 8px 16px;
+      background-color: #0984E3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .download-button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      background-color: #0984E3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    .progress-container {
+      margin-top: 20px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: white;
+      border: 1px solid #dfe6e9;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 45%;
+      background-color: #0984E3;
+      border-radius: 3px;
+    }
+    .progress-text {
+      text-align: center;
+      margin-top: 5px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h1 class="sidebar-title">Music Downloader</h1>
+      </div>
+      <div class="sidebar-nav">
+        <button class="nav-button active">Download</button>
+        <button class="nav-button">Library</button>
+      </div>
+      <div class="sidebar-footer">
+        <button class="nav-button">Settings</button>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Search Section -->
+      <div class="search-section">
+        <label class="search-label">Search:</label>
+        <input type="text" class="search-input" placeholder="Enter song name or artist - song">
+        <button class="search-button">Search</button>
+      </div>
+      
+      <!-- Results Section -->
+      <div class="results-container">
+        <!-- YouTube Results -->
+        <div class="results-column">
+          <h2 class="column-title">YouTube Results</h2>
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th style="width: 70%">Title</th>
+                <th style="width: 30%">Channel</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Imagine Dragons - Believer (Official Music Video)</td>
+                <td>ImagineDragonsVEVO</td>
+              </tr>
+              <tr>
+                <td>Believer - Imagine Dragons (Lyrics) 🎵</td>
+                <td>Loku</td>
+              </tr>
+              <tr>
+                <td>Imagine Dragons - Believer (Audio)</td>
+                <td>ImagineDragonsVEVO</td>
+              </tr>
+              <tr>
+                <td>Imagine Dragons - Believer (Live 2017)</td>
+                <td>Rock Music</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Spotify Metadata -->
+        <div class="results-column">
+          <h2 class="column-title">Spotify Metadata</h2>
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th style="width: 40%">Title</th>
+                <th style="width: 30%">Artist</th>
+                <th style="width: 30%">Album</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Believer</td>
+                <td>Imagine Dragons</td>
+                <td>Evolve</td>
+              </tr>
+              <tr>
+                <td>Believer - Acoustic</td>
+                <td>Imagine Dragons</td>
+                <td>Evolve (Deluxe)</td>
+              </tr>
+              <tr>
+                <td>Believer - Kaskade Remix</td>
+                <td>Imagine Dragons, Kaskade</td>
+                <td>Believer (Remixes)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Options Section -->
+      <div class="options-section">
+        <label class="quality-label">Quality:</label>
+        <select class="quality-select">
+          <option>Best (320k)</option>
+          <option>High (256k)</option>
+          <option>Medium (192k)</option>
+          <option>Low (128k)</option>
+        </select>
+        
+        <span class="location-label">Download location: /Users/Music</span>
+        <button class="change-button">Change</button>
+      </div>
+      
+      <!-- Download Button -->
+      <button class="download-button">Download</button>
+      
+      <!-- Progress Section -->
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+        <div class="progress-text">Downloading... 45%</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

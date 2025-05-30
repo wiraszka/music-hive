@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1100" height="700" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="1100" height="700" fill="#F5F6FA"/>
+  
+  <!-- Header/Title bar -->
+  <rect x="0" y="0" width="1100" height="30" fill="#2D3436"/>
+  <text x="20" y="20" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="white">Music Downloader &amp; Library Manager</text>
+  
+  <!-- Sidebar -->
+  <rect x="0" y="30" width="220" height="670" fill="#2D3436"/>
+  
+  <!-- Sidebar Header -->
+  <rect x="0" y="30" width="220" height="60" fill="#1e2527"/>
+  <text x="20" y="65" font-family="Segoe UI, SF Pro, Arial" font-size="18" font-weight="bold" fill="white">Music Downloader</text>
+  
+  <!-- Sidebar Navigation Buttons -->
+  <rect x="10" y="110" width="200" height="40" rx="4" ry="4" fill="#0984E3"/>
+  <text x="25" y="135" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="white">Download</text>
+  
+  <rect x="10" y="160" width="200" height="40" rx="4" ry="4" fill="transparent"/>
+  <text x="25" y="185" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="white">Library</text>
+  
+  <!-- Settings Button at Bottom -->
+  <rect x="10" y="640" width="200" height="40" rx="4" ry="4" fill="transparent"/>
+  <text x="25" y="665" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="white">Settings</text>
+  
+  <!-- Main Content Area - Download Tab -->
+  <rect x="220" y="30" width="880" height="670" fill="#F5F6FA"/>
+  
+  <!-- Search Section -->
+  <text x="240" y="65" font-family="Segoe UI, SF Pro, Arial" font-size="16" font-weight="bold" fill="#2D3436">Search:</text>
+  <rect x="320" y="45" width="670" height="35" rx="4" ry="4" fill="white" stroke="#dfe6e9"/>
+  <rect x="1000" y="45" width="80" height="35" rx="4" ry="4" fill="#0984E3"/>
+  <text x="1020" y="67" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="white">Search</text>
+  
+  <!-- Results Sections -->
+  <text x="240" y="115" font-family="Segoe UI, SF Pro, Arial" font-size="16" font-weight="bold" fill="#2D3436">YouTube Results</text>
+  <rect x="240" y="125" width="410" height="400" rx="4" ry="4" fill="white" stroke="#dfe6e9"/>
+  
+  <text x="670" y="115" font-family="Segoe UI, SF Pro, Arial" font-size="16" font-weight="bold" fill="#2D3436">Spotify Metadata</text>
+  <rect x="670" y="125" width="410" height="400" rx="4" ry="4" fill="white" stroke="#dfe6e9"/>
+  
+  <!-- YouTube Results Table Headers -->
+  <rect x="240" y="125" width="410" height="30" rx="4" ry="4" fill="#dfe6e9"/>
+  <text x="255" y="145" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436">Title</text>
+  <text x="515" y="145" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436">Channel</text>
+  
+  <!-- Spotify Results Table Headers -->
+  <rect x="670" y="125" width="410" height="30" rx="4" ry="4" fill="#dfe6e9"/>
+  <text x="685" y="145" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436">Title</text>
+  <text x="825" y="145" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436">Artist</text>
+  <text x="945" y="145" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436">Album</text>
+  
+  <!-- Download Options -->
+  <text x="240" y="555" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Quality:</text>
+  <rect x="300" y="535" width="120" height="35" rx="4" ry="4" fill="white" stroke="#dfe6e9"/>
+  <text x="315" y="557" font-family="Segoe UI, SF Pro, Arial" font-size="13" fill="#2D3436">Best (320k)</text>
+  
+  <text x="650" y="555" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="#2D3436">Download location: /Users/Music</text>
+  <rect x="990" y="535" width="90" height="35" rx="4" ry="4" fill="#0984E3"/>
+  <text x="1010" y="557" font-family="Segoe UI, SF Pro, Arial" font-size="14" fill="white">Change</text>
+  
+  <!-- Download Button -->
+  <rect x="240" y="585" width="840" height="40" rx="4" ry="4" fill="#0984E3"/>
+  <text x="645" y="610" font-family="Segoe UI, SF Pro, Arial" font-size="16" font-weight="bold" fill="white">Download</text>
+  
+  <!-- Progress Bar (Hidden by default) -->
+  <rect x="240" y="640" width="840" height="20" rx="4" ry="4" fill="white" stroke="#dfe6e9"/>
+  <rect x="240" y="640" width="420" height="20" rx="4" ry="4" fill="#0984E3"/>
+  <text x="645" y="655" font-family="Segoe UI, SF Pro, Arial" font-size="12" fill="#2D3436">Downloading... 50%</text>
+</svg>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Downloader - Library Tab</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #F5F6FA;
+      color: #2D3436;
+    }
+    .app-container {
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 220px;
+      background-color: #2D3436;
+      color: white;
+    }
+    .sidebar-header {
+      background-color: #1e2527;
+      padding: 20px;
+    }
+    .sidebar-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
+    }
+    .sidebar-nav {
+      padding: 10px;
+    }
+    .nav-button {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 4px;
+      text-align: left;
+      font-size: 14px;
+      background-color: transparent;
+      color: white;
+      cursor: pointer;
+    }
+    .nav-button.active {
+      background-color: #0984E3;
+    }
+    .sidebar-footer {
+      position: absolute;
+      bottom: 20px;
+      width: 200px;
+      padding: 0 10px;
+    }
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .header-section {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .library-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
+      margin-right: 20px;
+    }
+    .library-path {
+      flex: 1;
+      font-size: 14px;
+    }
+    .button {
+      padding: 8px 16px;
+      margin-left: 10px;
+      background-color: #0984E3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .filter-section {
+      margin-bottom: 20px;
+    }
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      background-color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid #dfe6e9;
+      display: inline-block;
+    }
+    .checkbox {
+      margin-right: 10px;
+    }
+    .progress-container {
+      margin-bottom: 20px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: white;
+      border: 1px solid #dfe6e9;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 40%;
+      background-color: #0984E3;
+      border-radius: 3px;
+    }
+    .progress-text {
+      text-align: center;
+      margin-top: 5px;
+      font-size: 12px;
+    }
+    .library-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .library-table th {
+      background-color: #dfe6e9;
+      padding: 10px;
+      text-align: left;
+    }
+    .library-table td {
+      padding: 10px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .library-table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .status-complete {
+      color: #00b894;
+    }
+    .status-incomplete {
+      color: #d63031;
+    }
+    .get-info-button {
+      padding: 6px 12px;
+      background-color: #0984E3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .metadata-dialog {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      z-index: 100;
+    }
+    .dialog-header {
+      background-color: #2D3436;
+      color: white;
+      padding: 15px 20px;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+    .dialog-title {
+      margin: 0;
+      font-size: 16px;
+      text-align: center;
+    }
+    .dialog-content {
+      padding: 20px;
+    }
+    .metadata-item {
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    .dialog-actions {
+      display: flex;
+      justify-content: space-around;
+      padding: 15px 20px 20px;
+    }
+    .cancel-button {
+      padding: 10px 30px;
+      background-color: #d63031;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .apply-button {
+      padding: 10px 30px;
+      background-color: #0984E3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h1 class="sidebar-title">Music Downloader</h1>
+      </div>
+      <div class="sidebar-nav">
+        <button class="nav-button">Download</button>
+        <button class="nav-button active">Library</button>
+      </div>
+      <div class="sidebar-footer">
+        <button class="nav-button">Settings</button>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header Section -->
+      <div class="header-section">
+        <h1 class="library-title">Music Library</h1>
+        <span class="library-path">Library path: /Users/adamwiraszka/Desktop/ADAM/Adam's Music</span>
+        <button class="button">Set Path</button>
+        <button class="button">Scan</button>
+      </div>
+      
+      <!-- Filter Section -->
+      <div class="filter-section">
+        <label class="checkbox-container">
+          <input type="checkbox" class="checkbox" checked>
+          Show tracks with missing metadata only
+        </label>
+      </div>
+      
+      <!-- Progress Section -->
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+        <div class="progress-text">Scanning... 40%</div>
+      </div>
+      
+      <!-- Library Table -->
+      <table class="library-table">
+        <thead>
+          <tr>
+            <th style="width: 25%">Title</th>
+            <th style="width: 20%">Artist</th>
+            <th style="width: 25%">Album</th>
+            <th style="width: 10%">Year</th>
+            <th style="width: 10%">Status</th>
+            <th style="width: 10%">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Bohemian Rhapsody</td>
+            <td>Queen</td>
+            <td>A Night at the Opera</td>
+            <td>1975</td>
+            <td class="status-complete">Complete</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Hotel California</td>
+            <td>Eagles</td>
+            <td></td>
+            <td></td>
+            <td class="status-incomplete">Incomplete</td>
+            <td><button class="get-info-button">Get Info</button></td>
+          </tr>
+          <tr>
+            <td>Billie Jean</td>
+            <td>Michael Jackson</td>
+            <td></td>
+            <td></td>
+            <td class="status-incomplete">Incomplete</td>
+            <td><button class="get-info-button">Get Info</button></td>
+          </tr>
+          <tr>
+            <td>Sweet Child O' Mine</td>
+            <td>Guns N' Roses</td>
+            <td>Appetite for Destruction</td>
+            <td>1987</td>
+            <td class="status-complete">Complete</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Smells Like Teen Spirit</td>
+            <td>Nirvana</td>
+            <td></td>
+            <td></td>
+            <td class="status-incomplete">Incomplete</td>
+            <td><button class="get-info-button">Get Info</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Metadata Update Dialog -->
+  <div class="overlay"></div>
+  <div class="metadata-dialog">
+    <div class="dialog-header">
+      <h2 class="dialog-title">Update Metadata</h2>
+    </div>
+    <div class="dialog-content">
+      <div class="metadata-item">Title: Billie Jean</div>
+      <div class="metadata-item">Artist: Michael Jackson</div>
+      <div class="metadata-item">Album: Thriller</div>
+      <div class="metadata-item">Year: 1982</div>
+      <div class="metadata-item">Album Art: Available</div>
+    </div>
+    <div class="dialog-actions">
+      <button class="cancel-button">Cancel</button>
+      <button class="apply-button">Apply</button>
+    </div>
+  </div>
+</body>
+</html>
