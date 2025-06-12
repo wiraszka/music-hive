@@ -94,7 +94,7 @@ def get_stylesheet(theme: Theme = Theme.DARK) -> str:
     
     QPushButton#sidebar_button:checked {{
         background-color: rgba(255, 255, 255, 0.1);
-        border-left: 3px solid {c.ACCENT_PRIMARY};
+        border-left: 3px solid #cccccc;
         font-weight: bold;
     }}
     
@@ -125,8 +125,8 @@ def get_stylesheet(theme: Theme = Theme.DARK) -> str:
     }}
     
     QPushButton#search_button {{
-        background-color: {c.ACCENT_PRIMARY};
-        color: white;
+        background-color: #cccccc;
+        color: #333333;
         border: none;
         border-radius: 0 4px 4px 0;
         padding: 10px 20px;
@@ -134,7 +134,7 @@ def get_stylesheet(theme: Theme = Theme.DARK) -> str:
     }}
     
     QPushButton#search_button:hover {{
-        background-color: {c.ACCENT_PRIMARY_HOVER};
+        background-color: #d9d9d9;
     }}
     
     /* Results Section */
@@ -172,6 +172,7 @@ def get_stylesheet(theme: Theme = Theme.DARK) -> str:
         background-color: white;
         alternate-background-color: {c.TABLE_ROW_ALTERNATE};
         gridline-color: #e0e0e0;
+        color: #333333;
     }}
     
     QTableView::item:hover {{
@@ -207,6 +208,7 @@ def get_stylesheet(theme: Theme = Theme.DARK) -> str:
         border: 1px solid #ddd;
         border-radius: 4px;
         background-color: white;
+        color: #333333;
     }}
     
     QLabel#location_label {{
@@ -214,20 +216,20 @@ def get_stylesheet(theme: Theme = Theme.DARK) -> str:
     }}
     
     QPushButton#location_button {{
-        background-color: {c.BUTTON_SECONDARY_BG};
-        color: white;
+        background-color: #cccccc;
+        color: #333333;
         border: none;
         border-radius: 4px;
         padding: 8px 15px;
     }}
     
     QPushButton#location_button:hover {{
-        background-color: {c.BUTTON_SECONDARY_HOVER};
+        background-color: #d9d9d9;
     }}
     
     QPushButton#download_button {{
-        background-color: {c.ACCENT_PRIMARY};
-        color: white;
+        background-color: #cccccc;
+        color: #333333;
         border: none;
         border-radius: 4px;
         padding: 10px 25px;
@@ -235,7 +237,7 @@ def get_stylesheet(theme: Theme = Theme.DARK) -> str:
     }}
     
     QPushButton#download_button:hover {{
-        background-color: {c.ACCENT_PRIMARY_HOVER};
+        background-color: #d9d9d9;
     }}
     
     /* Progress Bar */
@@ -254,8 +256,8 @@ def get_stylesheet(theme: Theme = Theme.DARK) -> str:
     
     /* Library Tab */
     QPushButton#library_button {{
-        background-color: {c.ACCENT_PRIMARY};
-        color: white;
+        background-color: #cccccc;
+        color: #333333;
         border: none;
         border-radius: 4px;
         padding: 8px 15px;
@@ -263,7 +265,7 @@ def get_stylesheet(theme: Theme = Theme.DARK) -> str:
     }}
     
     QPushButton#library_button:hover {{
-        background-color: {c.ACCENT_PRIMARY_HOVER};
+        background-color: #d9d9d9;
     }}
     
     QWidget#library_filters {{

@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
     QPushButton, QProgressBar, QComboBox, QTableWidget, 
     QTableWidgetItem, QHeaderView, QAbstractItemView, QMessageBox
 )
+# QAction import removed as it's not needed anymore
 from PyQt6.QtCore import Qt, QThread, pyqtSignal, QSize
 from PyQt6.QtGui import QIcon, QPixmap, QPalette, QBrush
 
@@ -214,37 +215,60 @@ class DownloadTab(QWidget):
         
         main_layout.addLayout(search_container_layout)
         
-        # Results section - initially hidden, only shown after search
+        # Results section - simplified structure
         self.results_container = QWidget()
         self.results_container.setVisible(False)  # Initially hidden
-        results_layout = QVBoxLayout(self.results_container)
-        results_layout.setContentsMargins(0, 20, 0, 0)
-        results_layout.setSpacing(5)
+        self.results_container.setMaximumHeight(300)  # Limit height to prevent overflow
+        self.results_container.setStyleSheet("""
+            QWidget {
+                background-color: rgba(255, 255, 255, 0.95);
+                border-radius: 8px;
+                border: 1px solid #cccccc;
+            }
+        """)
         
-        # Results list (similar to your original design in Capture1.PNG)
+        # Main results layout
+        results_layout = QVBoxLayout(self.results_container)
+        results_layout.setContentsMargins(20, 20, 20, 20)
+        results_layout.setSpacing(10)
+        
+        # Results title
+        results_title = QLabel("Search Results:")
+        results_title.setStyleSheet("""
+            font-size: 14px;
+            font-weight: bold;
+            color: #222222;
+            margin-bottom: 5px;
+        """)
+        results_layout.addWidget(results_title)
+        
+        # Results list with scroll area for better handling
+        from PyQt6.QtWidgets import QScrollArea
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setStyleSheet("""
+            QScrollArea {
+                border: none;
+                background-color: transparent;
+            }
+        """)
+        
         self.results_list = QWidget()
         self.results_list.setStyleSheet("""
             QWidget {
                 background-color: transparent;
             }
         """)
-        results_list_layout = QVBoxLayout(self.results_list)
-        results_list_layout.setContentsMargins(0, 0, 0, 0)
-        results_list_layout.setSpacing(8)
+        self.results_list_layout = QVBoxLayout(self.results_list)
+        self.results_list_layout.setContentsMargins(0, 0, 0, 0)
+        self.results_list_layout.setSpacing(10)
+        self.results_list_layout.addStretch()  # Add stretch at the end
         
-        # We'll add result items dynamically here after a search
-        # Each result will be a row with album art on left and song info on right
-        
-        results_layout.addWidget(self.results_list)
-        results_layout.addStretch()  # Push results to the top
+        scroll_area.setWidget(self.results_list)
+        results_layout.addWidget(scroll_area)
         
         # Add results container to main layout
-        results_container_layout = QHBoxLayout()
-        results_container_layout.addStretch(1)
-        results_container_layout.addWidget(self.results_container, 7)  # Take 70% of width 
-        results_container_layout.addStretch(1)
-        
-        main_layout.addLayout(results_container_layout)
+        main_layout.addWidget(self.results_container)
         
         # Download options
         options_layout = QHBoxLayout()
@@ -340,18 +364,30 @@ class DownloadTab(QWidget):
         self.status_label.setVisible(True)
         
         # Search YouTube
-        self.youtube_results = self.youtube.search(query)
-        
-        # Hide loading indicator
-        self.status_label.setVisible(False)
-        
-        # If no results found
-        if not self.youtube_results:
-            QMessageBox.information(self, "No Results", "No results found for your search term.")
+        try:
+            self.youtube_results = self.youtube.search(query)
+            
+            # Hide loading indicator
+            self.status_label.setVisible(False)
+            
+            # If no results found
+            if not self.youtube_results:
+                QMessageBox.information(self, "No Results", "No results found for your search term.")
+                return
+                
+        except Exception as e:
+            self.status_label.setVisible(False)
+            QMessageBox.critical(self, "Search Error", f"YouTube search failed: {str(e)}")
             return
             
+        # Clear previous results first
+        self._clear_results_list()
+        
         # Show results container if we have results
         self.results_container.setVisible(True)
+        
+        # Force layout update
+        self.results_container.updateGeometry()
         
         # Populate results list with YouTube results
         for i, result in enumerate(self.youtube_results):
@@ -361,6 +397,10 @@ class DownloadTab(QWidget):
             # Search Spotify for first result only
             if i == 0:
                 self._search_spotify_metadata(result['title'])
+        
+        # Force another layout update after adding items
+        self.results_list.updateGeometry()
+        self.results_container.updateGeometry()
                 
         # Set first result as selected
         if self.youtube_results:
@@ -368,13 +408,11 @@ class DownloadTab(QWidget):
     
     def _clear_results_list(self):
         """Clear all results from the list"""
-        # Get the layout
-        layout = self.results_list.layout()
-        
-        # Remove all widgets from the layout
-        if layout:
-            while layout.count():
-                item = layout.takeAt(0)
+        # Clear all widgets except the stretch at the end
+        if hasattr(self, 'results_list_layout'):
+            # Remove all widgets except the last one (which is the stretch)
+            while self.results_list_layout.count() > 1:
+                item = self.results_list_layout.takeAt(0)
                 widget = item.widget()
                 if widget:
                     widget.deleteLater()
@@ -387,61 +425,78 @@ class DownloadTab(QWidget):
             index: Result index
             result: Result data from YouTube search
         """
+        print(f"[GUI DEBUG] _add_result_item called for index {index}")
         # Create result item widget
         result_item = QWidget()
         result_item.setObjectName(f"result_item_{index}")
         result_item.setProperty("resultIndex", index)
         result_item.setCursor(Qt.CursorShape.PointingHandCursor)
+        result_item.setFixedHeight(60)  # Fixed compact height
         result_item.setStyleSheet("""
             QWidget[resultIndex] {
-                background-color: rgba(255, 255, 255, 0.9);
-                border-radius: 4px;
-                padding: 8px;
+                background-color: #ffffff;
+                border-radius: 6px;
+                border: 1px solid #e0e0e0;
+                margin: 2px;
             }
             QWidget[resultIndex]:hover {
-                background-color: rgba(255, 255, 255, 1.0);
+                background-color: #f8f8f8;
+                border: 1px solid #cccccc;
             }
         """)
         
-        # Create layout for result item
+        # Create layout for result item - no image space
         item_layout = QHBoxLayout(result_item)
-        item_layout.setContentsMargins(10, 10, 10, 10)
+        item_layout.setContentsMargins(12, 8, 12, 8)
         
-        # Album art (placeholder for now)
-        album_art = QLabel()
-        album_art.setFixedSize(60, 60)
-        album_art.setStyleSheet("""
-            background-color: #e0e0e0;
-            border-radius: 4px;
-        """)
-        item_layout.addWidget(album_art)
-        
-        # Result details
+        # Result details (full width)
         details_widget = QWidget()
         details_layout = QVBoxLayout(details_widget)
-        details_layout.setContentsMargins(10, 0, 0, 0)
-        details_layout.setSpacing(5)
+        details_layout.setContentsMargins(0, 0, 0, 0)
+        details_layout.setSpacing(2)
         
         # Title
-        title_label = QLabel(f"{index + 1}: {result['title']}")
+        title_label = QLabel(result['title'])
         title_label.setStyleSheet("""
             font-weight: bold;
-            color: #333333;
+            color: #1a1a1a;
+            font-size: 13px;
         """)
+        title_label.setWordWrap(True)
         details_layout.addWidget(title_label)
         
-        # Additional info (channel/duration)
-        info_label = QLabel(f"Channel: {result['channel']}")
-        info_label.setStyleSheet("""
-            color: #666666;
-            font-size: 12px;
+        # Channel and duration on same line
+        info_layout = QHBoxLayout()
+        info_layout.setContentsMargins(0, 0, 0, 0)
+        info_layout.setSpacing(8)
+        
+        # Channel
+        channel_label = QLabel(result['channel'])
+        channel_label.setStyleSheet("""
+            color: #555555;
+            font-size: 11px;
         """)
-        details_layout.addWidget(info_label)
+        info_layout.addWidget(channel_label)
+        
+        info_layout.addStretch()  # Push duration to right
+        
+        # Duration
+        duration_label = QLabel(result.get('duration', '00:00'))
+        duration_label.setStyleSheet("""
+            color: #777777;
+            font-size: 11px;
+            font-weight: bold;
+        """)
+        info_layout.addWidget(duration_label)
+        
+        details_layout.addLayout(info_layout)
         
         item_layout.addWidget(details_widget)
         
-        # Add to results list
-        self.results_list.layout().addWidget(result_item)
+        # Add to results list using the new layout structure
+        if hasattr(self, 'results_list_layout'):
+            # Insert before the stretch at the end
+            self.results_list_layout.insertWidget(self.results_list_layout.count() - 1, result_item)
         
         # Connect click event
         result_item.mousePressEvent = lambda event, idx=index: self._select_result(idx)
@@ -460,29 +515,35 @@ class DownloadTab(QWidget):
         self.download_button.setEnabled(True)
         
         # Highlight selected item and unhighlight others
-        for i in range(self.results_list.layout().count()):
-            widget = self.results_list.layout().itemAt(i).widget()
-            if widget:
-                if i == index:
-                    widget.setStyleSheet("""
-                        QWidget {
-                            background-color: rgba(255, 255, 255, 1.0);
-                            border-radius: 4px;
-                            border-left: 4px solid #e63b19;
-                            padding: 8px;
-                        }
-                    """)
-                else:
-                    widget.setStyleSheet("""
-                        QWidget {
-                            background-color: rgba(255, 255, 255, 0.9);
-                            border-radius: 4px;
-                            padding: 8px;
-                        }
-                        QWidget:hover {
-                            background-color: rgba(255, 255, 255, 1.0);
-                        }
-                    """)
+        if hasattr(self, 'results_list_layout'):
+            # Iterate through all widgets except the last one (stretch)
+            for i in range(self.results_list_layout.count() - 1):
+                item = self.results_list_layout.itemAt(i)
+                if item:
+                    widget = item.widget()
+                    if widget:
+                        if i == index:
+                            widget.setStyleSheet("""
+                                QWidget[resultIndex] {
+                                    background-color: #f0f0f0;
+                                    border-radius: 6px;
+                                    border: 2px solid #cccccc;
+                                    margin: 2px;
+                                }
+                            """)
+                        else:
+                            widget.setStyleSheet("""
+                                QWidget[resultIndex] {
+                                    background-color: #ffffff;
+                                    border-radius: 6px;
+                                    border: 1px solid #e0e0e0;
+                                    margin: 2px;
+                                }
+                                QWidget[resultIndex]:hover {
+                                    background-color: #f8f8f8;
+                                    border: 1px solid #cccccc;
+                                }
+                            """)
         
         # Search Spotify for metadata if needed
         if 0 <= index < len(self.youtube_results):
@@ -516,9 +577,19 @@ class DownloadTab(QWidget):
     
     def _change_download_location(self):
         """Change download location through parent window"""
-        # This will trigger the parent window's _set_download_location method
-        # which will update our download_location through update_download_location
-        self.window().findChild(QAction, "Set Download Location").trigger()
+        # Call the parent window's method directly
+        if hasattr(self.window(), '_set_download_location'):
+            self.window()._set_download_location()
+        else:
+            # Fallback to file dialog if parent method not available
+            from PyQt6.QtWidgets import QFileDialog
+            new_dir = QFileDialog.getExistingDirectory(
+                self, 
+                "Select Download Directory",
+                self.download_location
+            )
+            if new_dir:
+                self.update_download_location(new_dir)
     
     def update_download_location(self, new_location: str):
         """
@@ -559,8 +630,7 @@ class DownloadTab(QWidget):
         # Disable UI elements during download
         self.download_button.setEnabled(False)
         self.search_input.setEnabled(False)
-        self.youtube_results_table.setEnabled(False)
-        self.spotify_results_table.setEnabled(False)
+        self.results_list.setEnabled(False)
         self.quality_dropdown.setEnabled(False)
         
         # Create and start download worker
@@ -591,8 +661,7 @@ class DownloadTab(QWidget):
         # Re-enable UI elements
         self.download_button.setEnabled(True)
         self.search_input.setEnabled(True)
-        self.youtube_results_table.setEnabled(True)
-        self.spotify_results_table.setEnabled(True)
+        self.results_list.setEnabled(True)
         self.quality_dropdown.setEnabled(True)
         
         if success:

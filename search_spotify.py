@@ -16,9 +16,9 @@ class SpotifySearch:
     
     def __init__(self):
         """Initialize Spotify search with API credentials"""
-        # Get Spotify API credentials from environment variables
-        client_id = os.getenv('SPOTIFY_CLIENT_ID', '')
-        client_secret = os.getenv('SPOTIFY_CLIENT_SECRET', '')
+        # Get Spotify API credentials from environment variables or use defaults
+        client_id = os.getenv('SPOTIFY_CLIENT_ID', 'd8d22be2095f480591ce7de628699e26')
+        client_secret = os.getenv('SPOTIFY_CLIENT_SECRET', '71fbff9545254217b40e800f222cba84')
         
         self.is_available = bool(client_id and client_secret)
         
@@ -55,8 +55,15 @@ class SpotifySearch:
             return []
             
         try:
+            if not self.spotify:
+                logger.warning("Spotify client not initialized")
+                return []
+                
             results = self.spotify.search(q=query, type='track', limit=limit)
-            tracks = results.get('tracks', {}).get('items', [])
+            if not results:
+                return []
+                
+            tracks = results.get('tracks', {}).get('items', []) if results else []
             
             formatted_results = []
             for track in tracks:

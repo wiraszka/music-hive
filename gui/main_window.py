@@ -17,7 +17,6 @@ from PyQt6.QtGui import QIcon, QAction, QPixmap
 from gui.download_tab import DownloadTab
 from gui.library_tab import LibraryTab
 from gui.style import get_stylesheet, Theme
-from gui.audio_quality_selector import AudioQualitySelector
 from utils.config import Config
 
 logger = logging.getLogger(__name__)
@@ -172,25 +171,10 @@ class MainWindow(QMainWindow):
         Returns:
             The created button
         """
-        button = QPushButton(text)
+        button = QPushButton(f"{icon_text}  {text}")
         button.setObjectName("sidebar_button")
         button.setCheckable(True)
-        
-        # Create layout for button content
-        button_layout = QHBoxLayout(button)
-        button_layout.setContentsMargins(20, 12, 20, 12)
-        button_layout.setSpacing(10)
-        
-        # Add icon (using emoji for now)
-        icon_label = QLabel(icon_text)
-        icon_label.setObjectName("nav_icon")
-        button_layout.addWidget(icon_label)
-        
-        # Add text
-        text_label = QLabel(text)
-        text_label.setObjectName("nav_text")
-        button_layout.addWidget(text_label)
-        button_layout.addStretch()
+        button.setFixedHeight(45)
         
         # Connect click event
         button.clicked.connect(lambda: self._on_sidebar_button_clicked(page_index))
@@ -262,9 +246,10 @@ class MainWindow(QMainWindow):
         quality_title.setObjectName("settings_label")
         settings_layout.addWidget(quality_title)
         
-        from gui.download_tab import AudioQualitySelector
-        quality_selector = AudioQualitySelector()
-        quality_selector.set_quality(self.config.default_audio_quality)
+        from PyQt6.QtWidgets import QComboBox
+        quality_selector = QComboBox()
+        quality_selector.addItems(["Best (320k)", "High (256k)", "Medium (192k)", "Low (128k)"])
+        quality_selector.setCurrentText(self.config.default_audio_quality)
         settings_layout.addWidget(quality_selector)
         
         settings_layout.addStretch()

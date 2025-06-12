@@ -1,13 +1,13 @@
 """
 YouTube Search Module
-Handles searching for videos on YouTube
+Handles searching for videos on YouTube using yt-dlp
 """
 
-import re
 import logging
-from typing import List, Dict, Any, Tuple, Optional
-from urllib.parse import quote
-import requests
+from typing import List, Dict, Any, Optional
+import yt_dlp
+import subprocess
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -16,12 +16,16 @@ class YouTubeSearch:
     
     def __init__(self):
         """Initialize YouTube search"""
-        self.base_url = "https://www.youtube.com"
-        self.search_url = f"{self.base_url}/results?search_query="
+        self.ydl_opts = {
+            'quiet': True,
+            'no_warnings': True,
+            'extract_flat': True,
+            'default_search': 'ytsearch',
+        }
         
     def search(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
         """
-        Search YouTube for the given query
+        Search YouTube for the given query using yt-dlp
         
         Args:
             query: The search query
@@ -31,53 +35,41 @@ class YouTubeSearch:
             List of dictionaries with video info
         """
         try:
-            # Clean up the query
-            encoded_query = quote(query)
-            url = f"{self.search_url}{encoded_query}"
+            search_query = f"ytsearch{limit}:{query}"
             
-            # Make the request
-            response = requests.get(url)
-            
-            if response.status_code != 200:
-                logger.error(f"YouTube search request failed: {response.status_code}")
-                return []
-            
-            # Extract video IDs and details using regex
-            video_ids = re.findall(r'watch\?v=(\S{11})', response.text)
-            
-            # Remove duplicate IDs
-            unique_video_ids = []
-            for vid in video_ids:
-                if vid not in unique_video_ids:
-                    unique_video_ids.append(vid)
-            
-            # Limit results
-            unique_video_ids = unique_video_ids[:limit]
-            
-            # Get video details
-            results = []
-            for video_id in unique_video_ids:
-                # Extract basic information using regex patterns
-                title_pattern = f'title=".*?" aria-label=".*? by .+?" href="/watch\\?v={video_id}"'
-                title_match = re.search(title_pattern, response.text)
+            with yt_dlp.YoutubeDL(self.ydl_opts) as ydl:
+                search_results = ydl.extract_info(search_query, download=False)
                 
-                if title_match:
-                    title_text = title_match.group(0)
-                    title = re.search(r'aria-label="(.*?) by', title_text)
-                    channel = re.search(r'by (.+?)"', title_text)
-                    
-                    title_str = title.group(1) if title else "Unknown Title"
-                    channel_str = channel.group(1) if channel else "Unknown Channel"
-                    
-                    results.append({
-                        'id': video_id,
-                        'title': title_str,
-                        'channel': channel_str,
-                        'url': f"https://www.youtube.com/watch?v={video_id}"
-                    })
-            
-            return results
-            
+                if not search_results or 'entries' not in search_results:
+                    logger.warning(f"No results found for query: {query}")
+                    return []
+                
+                results = []
+                for entry in search_results['entries']:
+                    if entry and entry.get('id'):
+                        # Use basic info from search results - much faster and more reliable
+                        duration_str = "Unknown"
+                        if entry.get('duration'):
+                            try:
+                                duration = int(float(entry['duration']))  # Convert to int, handling floats
+                                mins, secs = divmod(duration, 60)
+                                duration_str = f"{mins:02d}:{secs:02d}"
+                            except (ValueError, TypeError):
+                                duration_str = "Unknown"
+                        
+                        results.append({
+                            'id': entry['id'],
+                            'title': entry.get('title', 'Unknown Title'),
+                            'channel': entry.get('uploader', 'Unknown Channel'), 
+                            'url': f"https://www.youtube.com/watch?v={entry['id']}",
+                            'duration': duration_str,
+                            'view_count': entry.get('view_count', 0),
+                            'upload_date': entry.get('upload_date', ''),
+                            'description': entry.get('description', '')[:200] + '...' if entry.get('description') else ''
+                        })
+                
+                return results
+                
         except Exception as e:
             logger.error(f"YouTube search error: {str(e)}")
             return []
@@ -93,32 +85,33 @@ class YouTubeSearch:
             Dictionary with video details or None if failed
         """
         try:
-            url = f"{self.base_url}/watch?v={video_id}"
-            response = requests.get(url)
+            url = f"https://www.youtube.com/watch?v={video_id}"
             
-            if response.status_code != 200:
-                logger.error(f"Failed to get video details: {response.status_code}")
-                return None
+            with yt_dlp.YoutubeDL(self.ydl_opts) as ydl:
+                info = ydl.extract_info(url, download=False)
                 
-            # Extract title
-            title_match = re.search(r'<title>(.*?) - YouTube</title>', response.text)
-            title = title_match.group(1) if title_match else "Unknown Title"
-            
-            # Extract channel
-            channel_match = re.search(r'"channelName":"(.*?)"', response.text)
-            channel = channel_match.group(1) if channel_match else "Unknown Channel"
-            
-            # Extract duration
-            duration_match = re.search(r'"lengthSeconds":"(\d+)"', response.text)
-            duration = int(duration_match.group(1)) if duration_match else 0
-            
-            return {
-                'id': video_id,
-                'title': title,
-                'channel': channel,
-                'duration': duration,
-                'url': url
-            }
+                if not info:
+                    return None
+                
+                duration_str = "Unknown"
+                if info.get('duration'):
+                    try:
+                        duration = int(float(info['duration']))  # Convert to int, handling floats
+                        mins, secs = divmod(duration, 60)
+                        duration_str = f"{mins:02d}:{secs:02d}"
+                    except (ValueError, TypeError):
+                        duration_str = "Unknown"
+                
+                return {
+                    'id': video_id,
+                    'title': info.get('title', 'Unknown Title'),
+                    'channel': info.get('uploader', 'Unknown Channel'),
+                    'duration': duration_str,
+                    'url': url,
+                    'view_count': info.get('view_count', 0),
+                    'upload_date': info.get('upload_date', ''),
+                    'description': info.get('description', '')[:200] + '...' if info.get('description') else ''
+                }
             
         except Exception as e:
             logger.error(f"Error getting video details: {str(e)}")
