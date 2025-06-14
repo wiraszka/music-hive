@@ -8,6 +8,7 @@ import logging
 from typing import Dict, Any, Optional, List
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+from utils.spotify_cache import get_spotify_cache
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,9 @@ class SpotifySearch:
         # Get Spotify API credentials from environment variables or use defaults
         client_id = os.getenv('SPOTIFY_CLIENT_ID', 'd8d22be2095f480591ce7de628699e26')
         client_secret = os.getenv('SPOTIFY_CLIENT_SECRET', '71fbff9545254217b40e800f222cba84')
+        
+        # Initialize cache
+        self.cache = get_spotify_cache()
         
         self.is_available = bool(client_id and client_secret)
         
@@ -54,13 +58,21 @@ class SpotifySearch:
             logger.warning("Spotify search unavailable: API not initialized")
             return []
             
+        # Check cache first
+        cached_results = self.cache.get(query, limit)
+        if cached_results is not None:
+            return cached_results
+            
         try:
             if not self.spotify:
                 logger.warning("Spotify client not initialized")
                 return []
                 
+            print(f"[API CALL] Making Spotify search for: {query}")
             results = self.spotify.search(q=query, type='track', limit=limit)
             if not results:
+                # Cache empty result to avoid repeated API calls
+                self.cache.put(query, [], limit)
                 return []
                 
             tracks = results.get('tracks', {}).get('items', []) if results else []
@@ -87,11 +99,15 @@ class SpotifySearch:
                     'album': track.get('album', {}).get('name', ''),
                     'album_art': album_art,
                     'preview_url': track.get('preview_url'),
-                    'release_date': track.get('album', {}).get('release_date', '')
+                    'release_date': track.get('album', {}).get('release_date', ''),
+                    'duration_ms': track.get('duration_ms', 0),
+                    'artists': [{'name': artist['name']} for artist in track.get('artists', [])]
                 }
                 
                 formatted_results.append(track_info)
-                
+            
+            # Cache the results
+            self.cache.put(query, formatted_results, limit)
             return formatted_results
             
         except Exception as e:

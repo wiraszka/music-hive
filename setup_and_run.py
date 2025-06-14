@@ -65,21 +65,213 @@ def create_default_directories():
     return download_dir, library_dir
 
 def check_system_requirements():
-    """Check system-specific requirements"""
+    """Check system-specific requirements including FFmpeg"""
     system = platform.system()
     
     if system == "Darwin":  # macOS
         print("✓ Running on macOS")
-        return True
+        return check_and_install_ffmpeg_macos()
     elif system == "Linux":
         print("✓ Running on Linux")
-        return True  
+        return check_and_install_ffmpeg_linux()
     elif system == "Windows":
         print("✓ Running on Windows")
-        return True
+        return check_and_install_ffmpeg_windows()
     else:
         print(f"⚠️  Untested system: {system}")
+        return check_ffmpeg_basic()
+
+def check_ffmpeg_basic():
+    """Basic FFmpeg check for unknown systems"""
+    try:
+        subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.DEVNULL)
+        print("✓ FFmpeg is installed")
         return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("✗ FFmpeg not found - please install manually")
+        print("Download from: https://ffmpeg.org/download.html")
+        return False
+
+def check_and_install_ffmpeg_macos():
+    """Check for FFmpeg and provide installation guidance"""
+    try:
+        result = subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.DEVNULL)
+        print("✓ FFmpeg is installed")
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("⚠ FFmpeg not found")
+        print("\nTo install FFmpeg on macOS, choose one option:")
+        print("\n1. Homebrew (recommended):")
+        print("   brew install ffmpeg")
+        print("\n2. Download manually:")
+        print("   • Visit: https://www.gyan.dev/ffmpeg/builds/")
+        print("   • Download macOS build")
+        print("   • Extract ffmpeg and ffprobe to ~/.local/bin/")
+        print("   • Run: chmod +x ~/.local/bin/ffmpeg ~/.local/bin/ffprobe")
+        print("   • Add to PATH: export PATH=\"$HOME/.local/bin:$PATH\"")
+        print("\n3. Using conda:")
+        print("   conda install -c conda-forge ffmpeg")
+        print("\nAfter installing FFmpeg, run this setup again.")
+        return False
+
+def install_ffmpeg_direct_macos():
+    """Install FFmpeg directly without Homebrew or admin privileges"""
+    import urllib.request
+    import zipfile
+    import platform
+    
+    # Get system architecture
+    machine = platform.machine().lower()
+    arch = 'arm64' if machine in ['arm64', 'aarch64'] else 'x86_64'
+    
+    # Create local bin directory
+    home_dir = os.path.expanduser("~")
+    local_bin = os.path.join(home_dir, ".local", "bin")
+    os.makedirs(local_bin, exist_ok=True)
+    
+    print("Downloading FFmpeg binaries...")
+    
+    # Download FFmpeg and FFprobe from evermeet.cx (reliable static builds)
+    binaries = ['ffmpeg', 'ffprobe']
+    base_url = "https://evermeet.cx/ffmpeg"
+    
+    try:
+        for binary in binaries:
+            download_url = f"{base_url}/{binary}.zip"
+            zip_path = os.path.join(local_bin, f"{binary}.zip")
+            
+            print(f"Downloading {binary}...")
+            urllib.request.urlretrieve(download_url, zip_path)
+            
+            # Extract binary
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extract(binary, local_bin)
+            
+            # Make executable
+            binary_path = os.path.join(local_bin, binary)
+            os.chmod(binary_path, 0o755)
+            
+            # Clean up zip
+            os.remove(zip_path)
+            print(f"✓ Installed {binary}")
+        
+        # Update PATH for current session
+        current_path = os.environ.get("PATH", "")
+        if local_bin not in current_path:
+            os.environ["PATH"] = f"{local_bin}:{current_path}"
+            print(f"✓ Added {local_bin} to PATH")
+        
+        # Verify installation
+        try:
+            subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.DEVNULL)
+            print("✓ FFmpeg installation verified")
+            return True
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            print("⚠ FFmpeg installed but not found in PATH")
+            return False
+            
+    except Exception as e:
+        print(f"✗ Direct installation failed: {e}")
+        print("Manual installation: Download from https://evermeet.cx/ffmpeg/")
+        return False
+
+def install_homebrew():
+    """Install Homebrew on macOS using a more reliable method"""
+    try:
+        print("Installing Homebrew automatically...")
+        
+        # Use shell=True for better compatibility with the installation script
+        install_command = 'curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | /bin/bash'
+        
+        # Set NONINTERACTIVE environment variable to skip prompts
+        env = os.environ.copy()
+        env['NONINTERACTIVE'] = '1'
+        
+        result = subprocess.run(
+            install_command,
+            shell=True,
+            env=env,
+            capture_output=False,  # Allow real-time output
+            text=True
+        )
+        
+        if result.returncode == 0:
+            print("✓ Homebrew installation completed")
+            
+            # Update PATH for current session
+            homebrew_paths = [
+                "/opt/homebrew/bin",  # Apple Silicon
+                "/usr/local/bin"      # Intel
+            ]
+            
+            current_path = os.environ.get("PATH", "")
+            for path in homebrew_paths:
+                if os.path.exists(path) and path not in current_path:
+                    os.environ["PATH"] = f"{path}:{current_path}"
+                    print(f"✓ Added {path} to PATH")
+            
+            # Verify Homebrew installation
+            try:
+                subprocess.check_call(["brew", "--version"], stdout=subprocess.DEVNULL)
+                return True
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                print("⚠ Homebrew installed but not in PATH, trying manual PATH update...")
+                return False
+        else:
+            print(f"✗ Homebrew installation failed with code {result.returncode}")
+            return False
+            
+    except Exception as e:
+        print(f"✗ Error during Homebrew installation: {e}")
+        return False
+
+def check_and_install_ffmpeg_linux():
+    """Check and install FFmpeg on Linux"""
+    try:
+        subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.DEVNULL)
+        print("✓ FFmpeg is installed")
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("⚠ FFmpeg not found - attempting installation...")
+        
+        # Try different package managers
+        package_managers = [
+            (["apt", "update"], ["apt", "install", "-y", "ffmpeg"]),
+            (["yum", "install", "-y", "ffmpeg"], None),
+            (["dnf", "install", "-y", "ffmpeg"], None),
+            (["pacman", "-S", "--noconfirm", "ffmpeg"], None)
+        ]
+        
+        for update_cmd, install_cmd in package_managers:
+            try:
+                if update_cmd and install_cmd:
+                    subprocess.check_call(update_cmd, stdout=subprocess.DEVNULL)
+                    subprocess.check_call(install_cmd)
+                else:
+                    subprocess.check_call(update_cmd)
+                print("✓ FFmpeg installed successfully")
+                return True
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                continue
+        
+        print("✗ Could not install FFmpeg automatically")
+        print("Please install manually using your system's package manager")
+        return False
+
+def check_and_install_ffmpeg_windows():
+    """Check and install FFmpeg on Windows"""
+    try:
+        subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.DEVNULL)
+        print("✓ FFmpeg is installed")
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("✗ FFmpeg not found")
+        print("Please install FFmpeg manually:")
+        print("1. Download from: https://www.gyan.dev/ffmpeg/builds/")
+        print("2. Extract to C:\\ffmpeg\\")
+        print("3. Add C:\\ffmpeg\\bin to your system PATH")
+        print("4. Restart your terminal/command prompt")
+        return False
 
 def run_application():
     """Run the music downloader application"""
