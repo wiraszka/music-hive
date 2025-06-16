@@ -59,10 +59,12 @@ class SongFilter:
         Returns:
             Filtered list of YouTube results
         """
-        # First pass: filter for valid songs
+        # First pass: filter for valid songs with adaptive criteria
         valid_results = []
+        is_artist_query = self._is_artist_search(search_query)
+        
         for result in youtube_results:
-            if self._is_valid_song(result, search_query):
+            if self._is_valid_song(result, search_query, relaxed=is_artist_query):
                 valid_results.append(result)
         
         # Second pass: remove duplicates
@@ -78,13 +80,14 @@ class SongFilter:
         
         return deduplicated_results
     
-    def _is_valid_song(self, result: Dict[str, Any], search_query: str) -> bool:
+    def _is_valid_song(self, result: Dict[str, Any], search_query: str, relaxed: bool = False) -> bool:
         """
         Check if a YouTube result represents a valid song
         
         Args:
             result: YouTube result dictionary
             search_query: Original search query
+            relaxed: Whether to use relaxed filtering criteria (for artist searches)
             
         Returns:
             True if the result appears to be a song
@@ -96,18 +99,19 @@ class SongFilter:
         if duration < self.MIN_DURATION or duration > self.MAX_DURATION:
             return False
         
-        # Check for exclusion keywords
-        if self._contains_exclusion_keywords(title):
+        # Check for exclusion keywords (more lenient for artist searches)
+        if self._contains_exclusion_keywords(title, relaxed=relaxed):
             return False
         
-        # Check relevance to search query
+        # Check relevance to search query with adaptive threshold
         relevance_score = self._calculate_youtube_relevance(result, search_query)
-        if relevance_score < 50:  # Basic relevance threshold
+        threshold = 25 if relaxed else 40  # Lower threshold for artist searches
+        if relevance_score < threshold:
             return False
         
         return True
     
-    def _contains_exclusion_keywords(self, title: str) -> bool:
+    def _contains_exclusion_keywords(self, title: str, relaxed: bool = False) -> bool:
         """Check if title contains keywords indicating non-song content"""
         title_lower = title.lower()
         
@@ -121,19 +125,20 @@ class SongFilter:
             if re.search(pattern, title_lower):
                 return True
         
-        # Additional specific patterns
-        additional_patterns = [
-            r'\blive\s+(at|in|from)\b',
-            r'\b\d+\s*hour[s]?\b',  # Multi-hour content
-            r'\bmix\s*#?\d+\b',     # DJ mixes (but not remixes)
-            r'\bfull\s+concert\b',
-            r'\bsetlist\b',
-            r'\bmashup\s+of\b'
-        ]
-        
-        for pattern in additional_patterns:
-            if re.search(pattern, title_lower):
-                return True
+        # Additional specific patterns (more lenient for artist searches)
+        if not relaxed:
+            additional_patterns = [
+                r'\blive\s+(at|in|from)\b',
+                r'\b\d+\s*hour[s]?\b',  # Multi-hour content
+                r'\bmix\s*#?\d+\b',     # DJ mixes (but not remixes)
+                r'\bfull\s+concert\b',
+                r'\bsetlist\b',
+                r'\bmashup\s+of\b'
+            ]
+            
+            for pattern in additional_patterns:
+                if re.search(pattern, title_lower):
+                    return True
         
         return False
     
